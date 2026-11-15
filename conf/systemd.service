@@ -1,0 +1,26 @@
+[Unit]
+Description=DigiStorm collaborative activities platform
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=__APP__
+Group=__APP__
+WorkingDirectory=__INSTALL_DIR__
+EnvironmentFile=__DATA_DIR__/.env
+Environment="PATH=__PATH_WITH_NODEJS__"
+Environment="NODE_ENV=production"
+ExecStart=/bin/bash -c "(REDISCLI_AUTH=\$DB_PWD /usr/bin/redis-cli -h 127.0.0.1 -p __PORT_REDIS__ ping >/dev/null 2>&1 || /usr/bin/redis-server __DATA_DIR__/redis.conf --daemonize yes --supervised no) && exec __NODEJS_DIR__/node ./server/app.js"
+ExecStop=/bin/bash -c "REDISCLI_AUTH=\$DB_PWD /usr/bin/redis-cli -h 127.0.0.1 -p __PORT_REDIS__ shutdown || true"
+Restart=on-failure
+RestartSec=5s
+TimeoutStartSec=120
+UMask=0027
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ReadWritePaths=__DATA_DIR__
+
+[Install]
+WantedBy=multi-user.target

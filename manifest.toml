@@ -1,0 +1,68 @@
+packaging_format = 2
+
+id = "digistorm"
+name = "DigiStorm"
+description.en = "Collaborative quiz and interactive activity platform"
+description.fr = "Plateforme collaborative de quiz et d’activités interactives"
+
+version = "1.3.1~ynh1"
+maintainers = []
+
+[upstream]
+license = "AGPL-3.0-only"
+website = "https://digistorm.app"
+admindoc = "https://codeberg.org/ladigitale/digistorm"
+code = "https://codeberg.org/ladigitale/digistorm"
+
+[integration]
+yunohost = ">= 12.1.40"
+helpers_version = "2.1"
+architectures = "all"
+multi_instance = true
+ldap = false
+sso = false
+disk = "500M"
+ram.build = "3G"
+ram.runtime = "512M"
+
+[install]
+    [install.domain]
+    type = "domain"
+
+    [install.path]
+    type = "path"
+    default = "/"
+
+    [install.init_main_permission]
+    type = "group"
+    default = "visitors"
+
+[resources]
+    [resources.sources]
+        [resources.sources.main]
+        url = "https://codeberg.org/ladigitale/digistorm/archive/1.3.1.tar.gz"
+        sha256 = "50eb31b1fb110505c0aad72495f7aae6e43cf1727f37d1ba72f684551ff8511d"
+        in_subdir = true
+        autoupdate.strategy = "latest_forgejo_tag"
+        autoupdate.upstream = "https://codeberg.org/ladigitale/digistorm"
+
+    [resources.ports.main]
+    default = 3000
+
+    [resources.ports.redis]
+    default = 16379
+
+    [resources.system_user]
+
+    [resources.install_dir]
+
+    [resources.data_dir]
+
+    [resources.permissions]
+        main.url = "/"
+
+    [resources.apt]
+    packages = "redis-server build-essential python3"
+
+    [resources.nodejs]
+    version = "24"

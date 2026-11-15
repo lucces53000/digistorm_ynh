@@ -1,0 +1,45 @@
+#!/bin/bash
+
+source "$(dirname "$0")/_common.sh"
+
+# This upstream release serves assets from the domain root only.
+if [ "${path%/}" != "" ]; then
+    ynh_die "DigiStorm ne prend pas en charge une installation en sous-chemin. Choisissez la racine / d'un domaine dédié."
+fi
+
+ynh_script_progression "Preparing DigiStorm settings..."
+
+port=$(ynh_app_setting_get --key=port)
+if [ -z "$port" ]; then port=3000; fi
+port_redis=$(ynh_app_setting_get --key=port_redis)
+ynh_app_setting_set --key=port --value="$port"
+ynh_app_setting_set --key=port_redis --value="$port_redis"
+db_pwd=$(ynh_string_random --length=48)
+session_key=$(ynh_string_random --length=64)
+ynh_app_setting_set --key=db_pwd --value="$db_pwd"
+ynh_app_setting_set --key=session_key --value="$session_key"
+
+ynh_script_progression "Installing DigiStorm source..."
+ynh_setup_source --dest_dir="$install_dir"
+
+mkdir -p "$data_dir/fichiers" "$data_dir/temp" "$install_dir/static/temp" "/var/log/$app"
+chown -R "$app:$app" "$install_dir" "$data_dir" "/var/log/$app"
+chmod 750 "$data_dir"
+chmod 750 "$data_dir/fichiers"
+chmod 750 "$data_dir/temp"
+
+ynh_script_progression "Installing Node.js dependencies and building DigiStorm..."
+install_node_dependencies
+configure_runtime
+
+ynh_script_progression "Configuring DigiStorm..."
+ynh_config_add --template="dotenv" --destination="$data_dir/.env"
+chmod 600 "$data_dir/.env"
+chown "$app:$app" "$data_dir/.env"
+ynh_config_add_nginx
+configure_systemd_runtime
+
+yunohost service add "$app" --description="DigiStorm collaborative activities platform" --log="systemd"
+
+ynh_script_progression "Starting DigiStorm..."
+ynh_systemctl --service="$app" --action=start --log_path="systemd" --wait_until="Redis prêt" --timeout=120

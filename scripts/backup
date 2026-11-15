@@ -1,0 +1,20 @@
+#!/bin/bash
+
+source /usr/share/yunohost/helpers
+
+# Persist Redis before stopping the service and archiving its files.
+was_running="no"
+systemctl is-active --quiet "$app.service" && was_running="yes"
+if [ "$was_running" = "yes" ]; then
+    REDISCLI_AUTH="$(ynh_app_setting_get --key=db_pwd)" redis-cli -h 127.0.0.1 -p "$(ynh_app_setting_get --key=port_redis)" SAVE
+    REDISCLI_AUTH="$(ynh_app_setting_get --key=db_pwd)" redis-cli -h 127.0.0.1 -p "$(ynh_app_setting_get --key=port_redis)" shutdown
+    ynh_systemctl --service="$app" --action=stop
+    trap '(/usr/bin/redis-server "$data_dir/redis.conf" --daemonize yes --supervised no || true); ynh_systemctl --service="$app" --action=start' EXIT
+fi
+
+ynh_backup "$install_dir"
+ynh_backup "$data_dir"
+ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf"
+ynh_backup "/etc/systemd/system/$app.service"
+
+
