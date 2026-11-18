@@ -20,7 +20,13 @@ configure_lti_origins
 ynh_systemctl --service="$app" --action=stop
 
 ynh_script_progression "Upgrading DigiStorm source..."
-ynh_setup_source --dest_dir="$install_dir" --full_replace --keep="static/fichiers static/temp"
+if [ -L "$install_dir/static/fichiers" ]; then
+    ynh_safe_rm "$install_dir/static/fichiers"
+fi
+if [ -L "$install_dir/static/temp" ]; then
+    ynh_safe_rm "$install_dir/static/temp"
+fi
+ynh_setup_source --dest_dir="$install_dir" --full_replace
 
 ynh_script_progression "Installing Node.js dependencies and building DigiStorm..."
 patch_lti_tls
