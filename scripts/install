@@ -18,6 +18,8 @@ db_pwd=$(ynh_string_random --length=48)
 session_key=$(ynh_string_random --length=64)
 ynh_app_setting_set --key=db_pwd --value="$db_pwd"
 ynh_app_setting_set --key=session_key --value="$session_key"
+ynh_app_setting_set --key=lti_platform_origins --value="${lti_platform_origins:-}"
+configure_lti_origins
 
 ynh_script_progression "Installing DigiStorm source..."
 ynh_setup_source --dest_dir="$install_dir"
