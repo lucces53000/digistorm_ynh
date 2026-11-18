@@ -56,3 +56,14 @@ EOF
     chown root:"$app" "$data_dir/redis.conf"
     chmod 640 "$data_dir/redis.conf"
 }
+
+configure_lti_origins() {
+    authorized_domains="https://$domain"
+
+    lti_platform_origins=$(ynh_app_setting_get --key=lti_platform_origins)
+    if [ -n "$lti_platform_origins" ]; then
+        authorized_domains="$authorized_domains,$lti_platform_origins"
+    fi
+
+    ynh_app_setting_set --key=authorized_domains --value="$authorized_domains"
+}
