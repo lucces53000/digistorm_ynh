@@ -15,6 +15,8 @@ Paquet communautaire indépendant des sources amont pour déployer [DigiStorm](h
 
 Depuis le gestionnaire d’applications YunoHost, installer ce paquet et choisir un domaine sans sous-chemin. Les dépendances système, Node, Redis, le service systemd et la configuration Nginx sont préparés par le paquet. La compilation Vite nécessite environ 3 Go de RAM libre et un accès réseau au registre npm pendant l’installation/la mise à niveau.
 
+Depuis **Opérations → Déplacer l’application vers une autre URL**, seul le nom de domaine peut être modifié. DigiStorm doit rester à la racine `/`.
+
 L’application n’a pas de configuration initiale du courrier dans le manifeste : Nodemailer tente le SMTP local `127.0.0.1:25`. Pour l’envoi des courriels (validation des comptes et réinitialisation de mot de passe), configurez un relais SMTP local fonctionnel ou ajustez les variables `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER` et `SMTP_PASSWORD` dans le fichier `$data_dir/.env`, puis redémarrez le service `digistorm`. Un échec de vérification SMTP est journalisé et ne bloque pas le démarrage, mais les courriels ne seront pas envoyés.
 
 ## Sauvegardes
