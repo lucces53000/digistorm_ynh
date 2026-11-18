@@ -2,9 +2,15 @@
 
 source "$(dirname "$0")/_common.sh"
 
-if [ "${new_path%/}" != "" ]; then
+if [ -n "${new_path:-}" ] && [ "${new_path}" != "/" ]; then
     ynh_die "DigiStorm ne prend pas en charge une installation en sous-chemin. Choisissez la racine / d'un domaine dédié."
 fi
+
+case "${new_domain:-}" in
+    ""|*/*|*:*|*" "*)
+        ynh_die "Le nouveau domaine doit être un nom de domaine seul, sans protocole, port ni chemin."
+        ;;
+esac
 
 ynh_script_progression "Changing DigiStorm URL..."
 
