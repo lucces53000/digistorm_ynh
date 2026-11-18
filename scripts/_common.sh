@@ -57,6 +57,27 @@ EOF
     chmod 640 "$data_dir/redis.conf"
 }
 
+prepare_source_upgrade() {
+    mkdir -p "$data_dir/fichiers" "$data_dir/temp"
+
+    if [ -L "$install_dir/static/fichiers" ]; then
+        ynh_safe_rm "$install_dir/static/fichiers"
+    elif [ -d "$install_dir/static/fichiers" ]; then
+        cp -a "$install_dir/static/fichiers/." "$data_dir/fichiers/"
+        ynh_safe_rm "$install_dir/static/fichiers"
+    elif [ -e "$install_dir/static/fichiers" ]; then
+        ynh_die "static/fichiers existe mais n'est pas un répertoire ou un lien symbolique valide."
+    fi
+
+    if [ -L "$install_dir/static/temp" ]; then
+        ynh_safe_rm "$install_dir/static/temp"
+    elif [ -d "$install_dir/static/temp" ]; then
+        ynh_safe_rm "$install_dir/static/temp"
+    elif [ -e "$install_dir/static/temp" ]; then
+        ynh_die "static/temp existe mais n'est pas un répertoire ou un lien symbolique valide."
+    fi
+}
+
 configure_lti_origins() {
     authorized_domains="https://$domain"
 

@@ -25,7 +25,7 @@ Cette valeur peut être saisie lors de l’installation dans **Origines Moodle a
 
 ```bash
 yunohost app setting digistorm lti_platform_origins -v "https://formadist.ynh.fr"
-yunohost app upgrade digistorm -u "https://github.com/lucces53000/digistorm_ynh"
+yunohost app upgrade digistorm -u "https://github.com/lucces53000/digistorm_ynh/tree/lucces53000-fix-moodle-lti-registration"
 ```
 
 La relance de l’application réécrit `AUTHORIZED_DOMAINS` avec le domaine DigiStorm et les origines Moodle autorisées. Dans Moodle, utilisez `https://digistorm.example.tld/lti/register` comme URL d’outil externe.
