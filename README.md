@@ -19,7 +19,7 @@ L’application n’a pas de configuration initiale du courrier dans le manifest
 
 ## Enregistrement LTI 1.3 avec Moodle
 
-L’enregistrement dynamique doit être activé avec l’origine exacte de chaque plateforme Moodle, séparée par une virgule pour plusieurs instances. Exemple : `https://formadist.ynh.fr`.
+L’enregistrement dynamique doit être activé avec l’origine exacte de chaque plateforme Moodle, séparée par une virgule pour plusieurs instances. Exemple : `https://formadist.ynh.fr`. Utilisez uniquement le protocole et le domaine, sans chemin comme `/moodle`.
 
 Cette valeur peut être saisie lors de l’installation dans **Origines Moodle autorisées**. Sur une installation existante, configurez-la avec :
 

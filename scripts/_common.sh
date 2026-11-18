@@ -62,19 +62,72 @@ configure_lti_origins() {
 
     lti_platform_origins=$(ynh_app_setting_get --key=lti_platform_origins)
     if [ -n "$lti_platform_origins" ]; then
-        authorized_domains="$authorized_domains,$lti_platform_origins"
+        lti_platform_origins=$(python3 -c 'import sys, urllib.parse
+origins = []
+for value in sys.argv[1].split(","):
+    value = value.strip()
+    if not value:
+        continue
+    parsed = urllib.parse.urlsplit(value)
+    if parsed.scheme in ("http", "https") and parsed.hostname:
+        origins.append(parsed.scheme.lower() + "://" + parsed.netloc)
+print(",".join(origins))' "$lti_platform_origins")
+        if [ -n "$lti_platform_origins" ]; then
+            authorized_domains="$authorized_domains,$lti_platform_origins"
+        fi
     fi
 
     ynh_app_setting_set --key=authorized_domains --value="$authorized_domains"
 }
 
 patch_lti_tls() {
-    local package_dir
-    package_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+    python3 - "$install_dir/server/lti.js" <<'PY'
+import sys
+from pathlib import Path
 
-    if [ -f "$package_dir/conf/lti-tls.patch" ] && [ -f "$install_dir/server/lti.js" ]; then
-        if ! grep -q "import tls from 'tls'" "$install_dir/server/lti.js"; then
-            patch -d "$install_dir" -p1 -i "$package_dir/conf/lti-tls.patch"
-        fi
-    fi
+path = Path(sys.argv[1])
+text = path.read_text(encoding="utf-8")
+
+text = text.replace("import net from 'net'\n", "import net from 'net'\nimport tls from 'tls'\n", 1)
+text = text.replace(
+    "import { Agent, buildConnector, fetch as fetchSecurise } from 'undici'",
+    "import { Agent, fetch as fetchSecurise } from 'undici'",
+    1,
+)
+
+start_marker = "const connecteurParDefaut = buildConnector({})"
+end_marker = "class GestionnaireRequetesSecurise"
+start = text.find(start_marker)
+end = text.find(end_marker, start)
+if start >= 0 and end >= 0:
+    block = """function construireConnecteurSecurise () {
+\treturn (options, callback) => {
+\t\tconst nomServeur = options.servername || options.hostname
+\t\tdnsPromises.lookup(nomServeur).then((resultat) => {
+\t\t\tif (verifierAdressePrivee(resultat.address)) {
+\t\t\t\tcallback(new Error('Adresse non autorisée : ' + nomServeur + ' (' + resultat.address + ')'), null)
+\t\t\t\treturn
+\t\t\t}
+\t\t\tconst port = options.port || (options.protocol === 'https:' ? 443 : 80)
+\t\t\tconst socketOptions = { host: resultat.address, port, localAddress: options.localAddress }
+\t\t\tconst socket = options.protocol === 'https:'
+\t\t\t\t? tls.connect({ ...socketOptions, servername: nomServeur })
+\t\t\t\t: net.connect(socketOptions)
+\t\t\tsocket.once('error', (erreur) => callback(erreur, null))
+\t\t\tsocket.once(options.protocol === 'https:' ? 'secureConnect' : 'connect', () => callback(null, socket))
+\t\t}).catch((erreur) => callback(erreur, null))
+\t}
 }
+
+"""
+    text = text[:start] + block + text[end:]
+elif "buildConnector" not in text:
+    pass
+else:
+    raise SystemExit("Unexpected DigiStorm LTI source layout")
+
+if "const connecteurParDefaut" in text or "buildConnector" in text:
+    raise SystemExit("DigiStorm LTI TLS patch was not applied")
+
+path.write_text(text, encoding="utf-8")
+PY
