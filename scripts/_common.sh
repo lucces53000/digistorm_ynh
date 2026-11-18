@@ -67,3 +67,14 @@ configure_lti_origins() {
 
     ynh_app_setting_set --key=authorized_domains --value="$authorized_domains"
 }
+
+patch_lti_tls() {
+    local package_dir
+    package_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+    if [ -f "$package_dir/conf/lti-tls.patch" ] && [ -f "$install_dir/server/lti.js" ]; then
+        if ! grep -q "import tls from 'tls'" "$install_dir/server/lti.js"; then
+            patch -d "$install_dir" -p1 -i "$package_dir/conf/lti-tls.patch"
+        fi
+    fi
+}

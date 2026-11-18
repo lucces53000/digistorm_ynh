@@ -31,6 +31,7 @@ chmod 750 "$data_dir/fichiers"
 chmod 750 "$data_dir/temp"
 
 ynh_script_progression "Installing Node.js dependencies and building DigiStorm..."
+patch_lti_tls
 install_node_dependencies
 configure_runtime
 

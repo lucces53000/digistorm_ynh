@@ -64,7 +64,7 @@ ram.runtime = "512M"
         main.url = "/"
 
     [resources.apt]
-    packages = "redis-server build-essential python3 zlib1g-dev"
+    packages = "redis-server build-essential python3 patch zlib1g-dev"
 
     [resources.nodejs]
     version = "24"

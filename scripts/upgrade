@@ -23,6 +23,7 @@ ynh_script_progression "Upgrading DigiStorm source..."
 ynh_setup_source --dest_dir="$install_dir" --full_replace --keep="static/fichiers static/temp"
 
 ynh_script_progression "Installing Node.js dependencies and building DigiStorm..."
+patch_lti_tls
 install_node_dependencies
 configure_runtime
 
