@@ -131,3 +131,4 @@ if "const connecteurParDefaut" in text or "buildConnector" in text:
 
 path.write_text(text, encoding="utf-8")
 PY
+}
