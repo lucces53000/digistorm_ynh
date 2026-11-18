@@ -1,0 +1,24 @@
+#!/bin/bash
+
+source "$(dirname "$0")/_common.sh"
+
+if [ "${new_path%/}" != "" ]; then
+    ynh_die "DigiStorm ne prend pas en charge une installation en sous-chemin. Choisissez la racine / d'un domaine dédié."
+fi
+
+ynh_script_progression "Changing DigiStorm URL..."
+
+ynh_systemctl --service="$app" --action=stop
+
+domain="$new_domain"
+ynh_app_setting_set --key=domain --value="$new_domain"
+
+ynh_config_add --template="dotenv" --destination="$data_dir/.env"
+chmod 600 "$data_dir/.env"
+chown "$app:$app" "$data_dir/.env"
+
+ynh_config_add_nginx
+configure_systemd_runtime
+
+ynh_systemctl --service="$app" --action=start --log_path="systemd" --wait_until="Redis prêt" --timeout=120
+ynh_systemctl --service=nginx --action=reload

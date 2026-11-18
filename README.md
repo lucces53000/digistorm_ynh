@@ -17,19 +17,6 @@ Depuis le gestionnaire d’applications YunoHost, installer ce paquet et choisir
 
 L’application n’a pas de configuration initiale du courrier dans le manifeste : Nodemailer tente le SMTP local `127.0.0.1:25`. Pour l’envoi des courriels (validation des comptes et réinitialisation de mot de passe), configurez un relais SMTP local fonctionnel ou ajustez les variables `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER` et `SMTP_PASSWORD` dans le fichier `$data_dir/.env`, puis redémarrez le service `digistorm`. Un échec de vérification SMTP est journalisé et ne bloque pas le démarrage, mais les courriels ne seront pas envoyés.
 
-## Enregistrement LTI 1.3 avec Moodle
-
-L’enregistrement dynamique doit être activé avec l’origine exacte de chaque plateforme Moodle, séparée par une virgule pour plusieurs instances. Exemple : `https://formadist.ynh.fr`. Utilisez uniquement le protocole et le domaine, sans chemin comme `/moodle`.
-
-Cette valeur peut être saisie lors de l’installation dans **Origines Moodle autorisées**. Sur une installation existante, configurez-la avec :
-
-```bash
-yunohost app setting digistorm lti_platform_origins -v "https://formadist.ynh.fr"
-yunohost app upgrade digistorm -u "https://github.com/lucces53000/digistorm_ynh"
-```
-
-La relance de l’application réécrit `AUTHORIZED_DOMAINS` avec le domaine DigiStorm et les origines Moodle autorisées. Dans Moodle, utilisez `https://digistorm.example.tld/lti/register` comme URL d’outil externe.
-
 ## Sauvegardes
 
 YunoHost sauvegarde le code installé, le répertoire de données (fichiers téléversés, Redis AOF/RDB et secrets) et les configurations Nginx/systemd. Redis est persisté avant l’archivage, puis l’unité est arrêtée et relancée par un trap à la fin du script si elle était active.

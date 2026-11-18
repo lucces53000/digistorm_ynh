@@ -6,7 +6,6 @@ ynh_script_progression "Preserving DigiStorm settings..."
 ynh_app_setting_set_default --key=db_pwd --value="$(ynh_string_random --length=48)"
 ynh_app_setting_set_default --key=session_key --value="$(ynh_string_random --length=64)"
 ynh_app_setting_set_default --key=port_redis --value="16379"
-ynh_app_setting_set_default --key=lti_platform_origins --value=""
 
 port=$(ynh_app_setting_get --key=port)
 port_redis=$(ynh_app_setting_get --key=port_redis)
@@ -15,7 +14,6 @@ ynh_app_setting_set --key=port --value="$port"
 if [ -z "$port_redis" ]; then port_redis=16379; ynh_app_setting_set --key=port_redis --value="$port_redis"; fi
 db_pwd=$(ynh_app_setting_get --key=db_pwd)
 session_key=$(ynh_app_setting_get --key=session_key)
-configure_lti_origins
 
 ynh_systemctl --service="$app" --action=stop
 
@@ -29,7 +27,6 @@ fi
 ynh_setup_source --dest_dir="$install_dir" --full_replace
 
 ynh_script_progression "Installing Node.js dependencies and building DigiStorm..."
-patch_lti_tls
 install_node_dependencies
 configure_runtime
 

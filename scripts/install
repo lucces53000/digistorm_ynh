@@ -18,8 +18,6 @@ db_pwd=$(ynh_string_random --length=48)
 session_key=$(ynh_string_random --length=64)
 ynh_app_setting_set --key=db_pwd --value="$db_pwd"
 ynh_app_setting_set --key=session_key --value="$session_key"
-ynh_app_setting_set --key=lti_platform_origins --value="${lti_platform_origins:-}"
-configure_lti_origins
 
 ynh_script_progression "Installing DigiStorm source..."
 ynh_setup_source --dest_dir="$install_dir"
@@ -31,7 +29,6 @@ chmod 750 "$data_dir/fichiers"
 chmod 750 "$data_dir/temp"
 
 ynh_script_progression "Installing Node.js dependencies and building DigiStorm..."
-patch_lti_tls
 install_node_dependencies
 configure_runtime
 

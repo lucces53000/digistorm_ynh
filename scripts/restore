@@ -8,7 +8,6 @@ ynh_restore "$data_dir"
 # Regenerate configuration with restored YunoHost app settings.
 ynh_app_setting_set_default --key=db_pwd --value="$(ynh_string_random --length=48)"
 ynh_app_setting_set_default --key=session_key --value="$(ynh_string_random --length=64)"
-ynh_app_setting_set_default --key=lti_platform_origins --value=""
 port=$(ynh_app_setting_get --key=port)
 port_redis=$(ynh_app_setting_get --key=port_redis)
 db_pwd=$(ynh_app_setting_get --key=db_pwd)
@@ -16,8 +15,6 @@ session_key=$(ynh_app_setting_get --key=session_key)
 if [ -z "$port" ]; then port=3000; fi
 ynh_app_setting_set --key=port --value="$port"
 if [ -z "$port_redis" ]; then port_redis=16379; ynh_app_setting_set --key=port_redis --value="$port_redis"; fi
-configure_lti_origins
-patch_lti_tls
 configure_runtime
 ynh_config_add --template="dotenv" --destination="$data_dir/.env"
 chmod 600 "$data_dir/.env"

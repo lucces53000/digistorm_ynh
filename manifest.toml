@@ -33,12 +33,6 @@ ram.runtime = "512M"
     type = "group"
     default = "visitors"
 
-        [install.lti_platform_origins]
-        ask.en = "Moodle origins allowed for LTI 1.3 dynamic registration (optional, comma-separated)"
-        ask.fr = "Origines Moodle autorisées pour l’enregistrement dynamique LTI 1.3 (facultatif, séparées par des virgules)"
-        type = "string"
-        default = ""
-
 [resources]
     [resources.sources]
         [resources.sources.main]
